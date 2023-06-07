@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,7 +9,7 @@ using UnityEngine.UI;
 public class SceneLoader : Singleton<SceneLoader>
 {
     private AsyncOperation _nextSceneLoadOperation;
-    
+    [SerializeField] private GameObject _gameObjectsOnLoadingScene;
 
     private void Start()
     {
@@ -36,6 +37,7 @@ public class SceneLoader : Singleton<SceneLoader>
 
     private IEnumerator LoadSceneRoutine(Scenes sceneName)
     {
+        
         //if there are more scene than loading scene, that means there is a scene need to unload.
         if (SceneManager.sceneCount > 1)
         {
@@ -47,13 +49,23 @@ public class SceneLoader : Singleton<SceneLoader>
             /*UpdateProgressUI(_nextSceneLoadOperation.progress);*/
             yield return null;
         }
+        SetUnActiveLoadingSceneGameobject();
         //Set active newly loaded scene
         SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex((int)sceneName));
         Resources.UnloadUnusedAssets();
         yield break;
     }
-    
 
+    private void SetUnActiveLoadingSceneGameobject() 
+    {
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+        {
+            Destroy(_gameObjectsOnLoadingScene);
+        }
+        
+    }
+    
+    
     public enum Scenes
     {
         LoadingScene = 0,
